@@ -1,0 +1,11 @@
+name: CI - Analytics Service
+on: [push]
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build Image
+        run: make
+
+
+
