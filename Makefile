@@ -4,3 +4,7 @@ docker-build:
 	docker build -t 739561048503.dkr.ecr.us-east-1.amazonaws.com/analytics-service:latest .
 	docker push 739561048503.dkr.ecr.us-east-1.amazonaws.com/analytics-service:latest
 
+eks-deploy:
+	aws eks update-kubeconfig --name dev
+	helm upgrade -i analytics-service . -f values/analytics-service.yml
+
