@@ -17,6 +17,6 @@ jobs:
           repository: raghudevopsb88/wmp-helm-v1
           path: helm
       - name: Helm Deploy
-        run: make eks-deploy
+        run: make eks-deploy image_tag=${GITHUB_SHA}
 
 
