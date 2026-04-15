@@ -23,7 +23,6 @@ jobs:
   dev-deploy:
     runs-on: self-hosted
     needs: test
-    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v6
       - uses: actions/checkout@v6
