@@ -1,5 +1,9 @@
 name: CI Main - Analytics Service
-on: [push]
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 jobs:
   docker_build:
     runs-on: self-hosted
