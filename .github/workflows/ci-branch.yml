@@ -3,17 +3,8 @@ on:
   push:
     branches-ignore:
       - main
-jobs:
-  docker_build:
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v6
-      - name: Build Image
-        run: make docker-build image_tag=${GITHUB_SHA}
 
-  test:
-    runs-on: self-hosted
-    needs: docker_build
-    steps:
-      - name: Run Tests
-        run: echo "Running tests..."
+jobs:
+  cicd:
+    uses: raghudevopsb88/github-reusable-workflows/.github/workflows/ci-b.yml@main
+
