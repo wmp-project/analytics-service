@@ -1,5 +1,5 @@
-argocd_server := $(shell kubectl get svc argocd-server  -o jsonpath='{.status.loadBalancer.ingress[].hostname}')
-argocd_admin_password := $(shell kubectl get secrets argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d)
+argocd_server = $(shell kubectl get svc argocd-server  -o jsonpath='{.status.loadBalancer.ingress[].hostname}')
+argocd_admin_password = $(shell kubectl get secrets argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d)
 
 docker-build:
 	git pull
