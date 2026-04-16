@@ -1,6 +1,3 @@
-argocd_server = $(shell kubectl get svc argocd-server  -o jsonpath='{.status.loadBalancer.ingress[].hostname}')
-argocd_admin_password = $(shell kubectl get secrets argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d)
-
 docker-build:
 	git pull
 	aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 739561048503.dkr.ecr.us-east-1.amazonaws.com
