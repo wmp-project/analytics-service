@@ -37,10 +37,12 @@ async def get_market_data(
         logger.info("No market data found, generating simulated data", ticker=ticker)
         try:
             rows = await _generate_simulated_data(db, ticker.upper())
-        except IntegrityError:
+        except Exception:
             await db.rollback()
             result = await db.execute(query)
             rows = result.scalars().all()
+            if not rows:
+                return [MarketDataResponse.model_validate(r) for r in _generate_in_memory(ticker.upper())]
 
     return [MarketDataResponse.model_validate(r) for r in rows]
 
@@ -59,10 +61,14 @@ async def get_latest_price(db: AsyncSession, ticker: str) -> MarketDataResponse 
         try:
             rows = await _generate_simulated_data(db, ticker.upper())
             row = rows[0] if rows else None
-        except IntegrityError:
+        except Exception:
             await db.rollback()
             result = await db.execute(query)
             row = result.scalar_one_or_none()
+            if not row:
+                mem_rows = _generate_in_memory(ticker.upper())
+                return MarketDataResponse.model_validate(mem_rows[0]) if mem_rows else None
+
 
     return MarketDataResponse.model_validate(row) if row else None
 
@@ -82,6 +88,29 @@ async def create_market_data(db: AsyncSession, data: MarketDataCreate) -> Market
     await db.flush()
     logger.info("Market data created", ticker=data.ticker_symbol, price=data.price)
     return MarketDataResponse.model_validate(record)
+
+
+def _generate_in_memory(ticker: str) -> list[MarketData]:
+    """Generate simulated data without persisting — used as fallback on DB conflicts."""
+    base_price = SIMULATED_PRICES.get(ticker, 100.0)
+    today = date.today()
+    records = []
+    for i in range(30):
+        d = today - timedelta(days=29 - i)
+        daily_change = random.uniform(-0.03, 0.03)
+        price = round(base_price * (1 + daily_change * (i / 30)), 4)
+        records.append(MarketData(
+            id=uuid.uuid4(),
+            ticker_symbol=ticker,
+            price=price,
+            open_price=round(price * random.uniform(0.98, 1.0), 4),
+            high_price=round(price * random.uniform(1.0, 1.02), 4),
+            low_price=round(price * random.uniform(0.97, 1.0), 4),
+            volume=random.randint(1_000_000, 50_000_000),
+            price_date=d,
+            source="SIMULATED",
+        ))
+    return records
 
 
 async def _generate_simulated_data(db: AsyncSession, ticker: str) -> list[MarketData]:
