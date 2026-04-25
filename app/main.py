@@ -1,8 +1,11 @@
 from contextlib import asynccontextmanager
 
+import traceback
+
 import structlog
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.api.router import api_router
@@ -54,6 +57,19 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Global exception handler — log full traceback for every 500
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(
+        "Unhandled exception",
+        path=request.url.path,
+        method=request.method,
+        error=str(exc),
+        traceback=traceback.format_exc(),
+    )
+    return JSONResponse(status_code=500, content={"detail": "Internal server error"})
+
 
 # Prometheus metrics
 Instrumentator().instrument(app).expose(app, endpoint="/metrics")
