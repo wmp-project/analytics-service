@@ -4,6 +4,7 @@ from datetime import date, timedelta
 
 import structlog
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.market_data import MarketData
@@ -34,7 +35,12 @@ async def get_market_data(
 
     if not rows:
         logger.info("No market data found, generating simulated data", ticker=ticker)
-        rows = await _generate_simulated_data(db, ticker.upper())
+        try:
+            rows = await _generate_simulated_data(db, ticker.upper())
+        except IntegrityError:
+            await db.rollback()
+            result = await db.execute(query)
+            rows = result.scalars().all()
 
     return [MarketDataResponse.model_validate(r) for r in rows]
 
@@ -50,8 +56,13 @@ async def get_latest_price(db: AsyncSession, ticker: str) -> MarketDataResponse 
     row = result.scalar_one_or_none()
 
     if not row:
-        rows = await _generate_simulated_data(db, ticker.upper())
-        row = rows[0] if rows else None
+        try:
+            rows = await _generate_simulated_data(db, ticker.upper())
+            row = rows[0] if rows else None
+        except IntegrityError:
+            await db.rollback()
+            result = await db.execute(query)
+            row = result.scalar_one_or_none()
 
     return MarketDataResponse.model_validate(row) if row else None
 
