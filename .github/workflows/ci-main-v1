@@ -27,7 +27,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/checkout@v6
         with:
-          repository: raghudevopsb88/wmp-helm-v1
+          repository: raghudevopsb88/wmp-helm-v2
           path: helm
       - name: Helm Deploy
         run: make eks-deploy image_tag=${GITHUB_SHA}
