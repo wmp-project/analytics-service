@@ -4,7 +4,7 @@ COPY        ./ /usr/src/
 RUN         sonar-scanner \
             -Dsonar.host.url=http://172.31.17.79:9000 \
             -Dsonar.login=admin -Dsonar.password=admin123 -Dsonar.qualitygate.wait=true \
-            -Dsonar.projectKey=portfolio-service \
+            -Dsonar.projectKey=analytics-service \
             -Dsonar.sources=. && \
             touch /tmp/scan-success
 
