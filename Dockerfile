@@ -8,7 +8,8 @@
 #            -Dsonar.sources=. && \
 #            touch /tmp/scan-success
 
-FROM        docker.io/library/python:3.12.13-alpine3.23-fips-dev
+FROM        docker.io/redhat/ubi9:latest
+RUN         dnf install -y python3.12 python3.12-pip python3.12-devel gcc
 #COPY        --from=sonar-scanner /tmp/scan-success /tmp/
 WORKDIR     /app
 COPY        ./ /app/
