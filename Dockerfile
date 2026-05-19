@@ -8,7 +8,7 @@
 #            -Dsonar.sources=. && \
 #            touch /tmp/scan-success
 
-FROM        docker.io/library/python:3.12
+FROM        docker.io/library/python:3.12.13-alpine3.23-fips-dev
 #COPY        --from=sonar-scanner /tmp/scan-success /tmp/
 WORKDIR     /app
 COPY        ./ /app/
