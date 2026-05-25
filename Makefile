@@ -11,4 +11,4 @@ eks-deploy:
 
 argocd-deploy:
 	argocd login $(argocd_server) --skip-test-tls --username admin --password $(argocd_admin_password)
-	argocd app create analytics-service --sync-policy auto --repo https://github.com/devmonkey/wmp-helm-v2.git --path . --dest-server https://kubernetes.default.svc   --dest-namespace default --helm-set-string image_tag=$(image_tag) --values values/analytics-service.yml --upsert
+	argocd app create analytics-service --sync-policy auto --repo https://github.com/wmp-project/wmp-helm-v2.git --path . --dest-server https://kubernetes.default.svc   --dest-namespace default --helm-set-string image_tag=$(image_tag) --values values/analytics-service.yml --upsert
